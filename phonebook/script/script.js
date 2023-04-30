@@ -214,9 +214,11 @@ const data = [
     tdDel.append(buttonDel);
 
     const tdName = document.createElement('td');
+    tdName.classList.add('name');
     tdName.textContent = firstName;
 
     const tdSurname = document.createElement('td');
+    tdSurname.classList.add('surname');
     tdSurname.textContent = surname;
 
     const tdPhone = document.createElement('td');
@@ -232,13 +234,24 @@ const data = [
   };
 
   const renderContacts = (elem, data) => {
+    elem.textContent = '';
     const allRow = data.map(createRow);
     elem.append(...allRow);
+
     return allRow;
   };
 
   const hoverRow = (allRow, logo) => {
     const text = logo.textContent;
+    for (const contact of allRow) {
+      contact.addEventListener('mouseenter', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    }
+    /*
     allRow.forEach(contact => {
       contact.addEventListener('mouseenter', () => {
         logo.textContent = contact.phoneLink.textContent;
@@ -247,6 +260,15 @@ const data = [
         logo.textContent = text;
       });
     });
+    */
+  };
+  // функция клонирования объекта
+  const cloneObj = (obj) => {
+    const newObj = {};
+    for (const key in obj) {
+      newObj[key] = obj[key];
+    }
+    return newObj;
   };
 
   const init = (selectorApp, title) => {
@@ -263,10 +285,11 @@ const data = [
     } = phoneBook;
 
     // Функционал
+    const logoAlt = cloneObj(logo);
+    renderContacts(list, data);
 
-    const allRow = renderContacts(list, data);
-
-    hoverRow(allRow, logo);
+    const allContact = document.getElementsByClassName('contact');
+    hoverRow(allContact, logo);
 
     btnAdd.addEventListener('click', () => {
       formOverlay.classList.add('is-visible');
@@ -290,16 +313,17 @@ const data = [
       if (target.closest('.del-icon')) {
         target.closest('.contact').remove();
       }
-    });
 
-    setTimeout(() => {
-      const contact = createRow({
-        name: 'Роман',
-        surname: 'Хоружий',
-        phone: '+79876543210',
-      });
-      list.append(contact);
-    }, 2000);
+      if (target.closest('.name') || target.closest('.surname')) {
+        data.sort((a, b) => (a[target.className] > b[target.className] ? 1 : -1));
+        renderContacts(list, data);
+        logo.textContent = logoAlt.textContent;
+        hoverRow(allContact, logo);
+      }
+    });
   };
+
   window.phoneBookInit = init;
 }
+
+
