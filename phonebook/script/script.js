@@ -91,8 +91,8 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete">Удалить</th>
-        <th>Имя</th>
-        <th>Фамилия</th>
+        <th class="name">Имя</th>
+        <th class="surname">Фамилия</th>
         <th>Телефон</th>
       </tr>
     `);
@@ -102,6 +102,7 @@ const data = [
     table.append(thead, tbody);
     // добавление свойства tbody в эелемент table
     table.tbody = tbody;
+    table.thead = thead;
 
 
     return table;
@@ -195,6 +196,7 @@ const data = [
     app.append(header, main, footer);
 
     return {
+      listTitle: table.thead,
       list: table.tbody,
       logo,
       btnAdd: buttonGroup.btns[0],
@@ -214,11 +216,11 @@ const data = [
     tdDel.append(buttonDel);
 
     const tdName = document.createElement('td');
-    tdName.classList.add('name');
+    // tdName.classList.add('name');
     tdName.textContent = firstName;
 
     const tdSurname = document.createElement('td');
-    tdSurname.classList.add('surname');
+    // tdSurname.classList.add('surname');
     tdSurname.textContent = surname;
 
     const tdPhone = document.createElement('td');
@@ -276,6 +278,7 @@ const data = [
     const phoneBook = renderPhoneBook(app, title);
 
     const {
+      listTitle,
       list,
       logo,
       btnAdd,
@@ -313,6 +316,10 @@ const data = [
       if (target.closest('.del-icon')) {
         target.closest('.contact').remove();
       }
+    });
+
+    listTitle.addEventListener('click', (e) => {
+      const target = e.target;
 
       if (target.closest('.name') || target.closest('.surname')) {
         data.sort((a, b) => (a[target.className] > b[target.className] ? 1 : -1));
