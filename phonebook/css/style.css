@@ -136,3 +136,28 @@ body {
   margin: 0;
   font-size: 20px;
 }
+
+.name,
+.surname,
+.phone {
+  position: relative;
+}
+
+.name::after,
+.surname::after,
+.phone::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 23px;
+}
+
+.up::after {
+  content: "\2191";
+}
+
+.down::after {
+  content: "\2193";
+}
+

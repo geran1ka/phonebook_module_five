@@ -91,9 +91,9 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete">Удалить</th>
-        <th class="name">Имя</th>
-        <th class="surname">Фамилия</th>
-        <th>Телефон</th>
+        <th class="name" data-sort="name">Имя</th>
+        <th class="surname" data-sort="surname">Фамилия</th>
+        <th class="phone" data-sort="phone">Телефон</th>
       </tr>
     `);
 
@@ -288,6 +288,18 @@ const data = [
     } = phoneBook;
 
     // Функционал
+    const getCounter = () => {
+      let count = 0;
+      const counter = () => count++;
+      counter.reset = () => count = 0;
+      return counter;
+    };
+
+    const clickName = getCounter();
+    const clickSurName = getCounter();
+    const clickPhone = getCounter();
+
+
     const logoAlt = cloneObj(logo);
     renderContacts(list, data);
 
@@ -300,6 +312,7 @@ const data = [
 
     formOverlay.addEventListener('click', (e) => {
       const target = e.target;
+
       if (target === formOverlay || target.closest('.close')) {
         formOverlay.classList.remove('is-visible');
       }
@@ -320,9 +333,41 @@ const data = [
 
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
+      if (target.closest('th')) {
+        let click = null;
 
-      if (target.closest('.name') || target.closest('.surname')) {
-        data.sort((a, b) => (a[target.className] > b[target.className] ? 1 : -1));
+        switch (target.dataset.sort) {
+          case 'name':
+            click = clickName();
+            clickSurName.reset();
+            clickPhone.reset();
+            break;
+          case 'surname':
+            click = clickSurName();
+            clickName.reset();
+            clickPhone.reset();
+            break;
+          case 'phone':
+            click = clickPhone();
+            clickName.reset();
+            clickSurName.reset();
+            break;
+        }
+
+        document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
+        document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
+
+
+        if (click % 2 === 0) {
+          data.sort((a, b) => (a[target.dataset.sort] > b[target.dataset.sort] ? -1 : 1));
+          document.querySelector(`.${target.dataset.sort}`).classList.add('up');
+        }
+
+        if (click % 2 === 1) {
+          data.sort((a, b) => (a[target.dataset.sort] > b[target.dataset.sort] ? 1 : -1));
+          document.querySelector(`.${target.dataset.sort}`).classList.add('down');
+        }
+
         renderContacts(list, data);
         logo.textContent = logoAlt.textContent;
         hoverRow(allContact, logo);
