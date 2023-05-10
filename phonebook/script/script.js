@@ -1,5 +1,5 @@
 'use strict';
-
+/*
 const data = [
   {
     name: 'Иван',
@@ -22,12 +22,8 @@ const data = [
     phone: '+79876543210',
   },
 ];
-
+*/
 {
-  const addContactData = (contact) => {
-    data.push(contact);
-    console.log('data: ', data);
-  };
   // функция создания контейнера
   const createContainer = () => {
     const container = document.createElement('div');
@@ -231,6 +227,7 @@ const data = [
 
     const tdPhone = document.createElement('td');
     const phoneLink = document.createElement('a');
+    phoneLink.classList.add('phone');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
     tr.phoneLink = phoneLink;
@@ -256,6 +253,25 @@ const data = [
     return tr;
   };
 
+  const getStorage = (key) => {
+    let arr = localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : [];
+    return arr;
+  };
+
+  const setStorage = (key, value) => {
+    let data = getStorage(key);
+    data.push(value);
+    localStorage.setItem(key, JSON.stringify(data));
+  };
+
+  const removeStorage = (phone) => {
+    localStorage.removeItem(phone);
+  };
+  console.log(localStorage);
+  getStorage('Роман')
+  console.log("getStorage('Роман'): ", getStorage('Роман'));
+
+  const data = getStorage('Роман');
   const renderContacts = (elem, data) => {
     elem.textContent = '';
     const allRow = data.map(createRow);
@@ -318,7 +334,12 @@ const data = [
     list.addEventListener('click', (e) => {
       const target = e.target;
       if (target.closest('.del-icon')) {
-        target.closest('.contact').remove();
+        const tr = target.closest('.contact');
+        console.log('tr: ', tr);
+        const phone = tr.querySelector('.phone').textContent;
+        console.log(phone);
+        tr.remove();
+        //localStorage.clear();
       }
     });
   };
@@ -396,12 +417,15 @@ const data = [
 
       const newContact = Object.fromEntries(formData);
       console.log('newContact: ', newContact);
-      addContactData(newContact);
+      setStorage('Роман', newContact);
       addContactPage(newContact, list);
       form.reset();
       closeModal();
     });
   };
+
+
+  
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
@@ -418,7 +442,6 @@ const data = [
 
     // Функционал
 
-
     const logoAlt = cloneObj(logo);
     renderContacts(list, data);
     const {closeModal} = modalControl(btnAdd, formOverlay);
@@ -429,7 +452,6 @@ const data = [
     sortControl(listTitle, list, logo, logoAlt, allContact);
     formControl(form, list, closeModal);
   };
-  console.log(data);
 
 
   window.phoneBookInit = init;
