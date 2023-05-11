@@ -342,13 +342,51 @@ const data = [
     counter.reset = () => count = 0;
     return counter;
   };
-/*
+
   const clickName = getCounter();
   const clickSurName = getCounter();
   const clickPhone = getCounter();
 
- 
-  const sortControl = (listTitle, list, logo, logoAlt, allContact, data) => {
+  const sortirovka = (sort, title) => {
+    let click = null;
+    console.log('sort', sort);
+    switch (sort) {
+      case 'name':
+        click = clickName();
+        clickSurName.reset();
+        clickPhone.reset();
+        break;
+      case 'surname':
+        click = clickSurName();
+        clickName.reset();
+        clickPhone.reset();
+        break;
+      case 'phone':
+        click = clickPhone();
+        clickName.reset();
+        clickSurName.reset();
+        break;
+    }
+
+    document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
+    document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
+
+    const dataLs = getStorage(title);
+    console.log('dataLs: ', dataLs);
+
+    if (click % 2 === 0) {
+      dataLs.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
+      document.querySelector(`.${sort}`)?.classList.add('up');
+    } else {
+      dataLs.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
+      document.querySelector(`.${sort}`)?.classList.add('down');
+    }
+    console.log(dataLs);
+    localStorage.setItem('click', click);
+    return dataLs;
+  };
+
+  const sortControl = (listTitle, list, logo, logoAlt, allContact, title) => {
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
 
@@ -357,49 +395,16 @@ const data = [
       });
 
       if (target.closest('th') && !target.closest('.th-edit')) {
-        console.log('click');
-        let click = null;
-        let sort = target.dataset.sort;
-        switch (sort) {
-          case 'name':
-            click = clickName();
-            clickSurName.reset();
-            clickPhone.reset();
-            break;
-          case 'surname':
-            click = clickSurName();
-            clickName.reset();
-            clickPhone.reset();
-            break;
-          case 'phone':
-            click = clickPhone();
-            clickName.reset();
-            clickSurName.reset();
-            break;
-        }
+        let sortKey = target.dataset.sort;
 
-        document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
-        document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
-
-
-        if (click % 2 === 0) {
-          data.sort((a, b) => (a[target.dataset.sort] > b[target.dataset.sort] ? -1 : 1));
-          document.querySelector(`.${target.dataset.sort}`)?.classList.add('up');
-        }
-
-        if (click % 2 === 1) {
-          data.sort((a, b) => (a[target.dataset.sort] > b[target.dataset.sort] ? 1 : -1));
-          document.querySelector(`.${target.dataset.sort}`)?.classList.add('down');
-        }
-
-        renderContacts(list, data);
-        logo.textContent = logoAlt.textContent;
-        hoverRow(allContact, logo);
-        //localStorage.setItem('sort', sort);
+        renderContacts(list, sortirovka(sortKey, title));
+        //logo.textContent = logoAlt.textContent;
+        //hoverRow(allContact, logo);
+        localStorage.setItem('sort', sortKey);
       }
     });
   };
-  */
+
 
   const addContactPage = (contact, list) => {
     list.append(createRow(contact));
@@ -432,16 +437,25 @@ const data = [
     } = renderPhoneBook(app, title);
 
     // Функционал
-    const data = getStorage(title);
-    //const logoAlt = cloneObj(logo);
-
-    renderContacts(list, data);
+    let data = getStorage(title);
+    console.log('data: ', data);
+    const logoAlt = cloneObj(logo);
+    console.log(localStorage.getItem('sort'));
+    
+    if (localStorage.getItem('sort')) {
+      console.log('sort');
+      renderContacts(list, sortirovka(localStorage.getItem('sort'), title));
+    } else {
+      renderContacts(list, data);
+    }
+    
+    
     const {closeModal} = modalControl(btnAdd, formOverlay);
-    //const allContact = document.getElementsByClassName('contact');
+    const allContact = document.getElementsByClassName('contact');
     //hoverRow(allContact, logo);
 
     deleteControl(btnDel, list, title);
-    // sortControl(listTitle, list, logo, logoAlt, allContact, data);
+    sortControl(listTitle, list, logo, logoAlt, allContact, title);
     formControl(form, title, list, closeModal);
   };
 
