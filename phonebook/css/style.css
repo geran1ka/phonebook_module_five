@@ -5,6 +5,7 @@ body {
 .header {
   background-color: #3E5E93;
   color: #fff;
+  height: 86px;
   margin-bottom: 40px;
   padding: 20px 0;
   text-align: center;

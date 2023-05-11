@@ -253,30 +253,25 @@ const data = [
     return tr;
   };
 
-  const getStorage = (key) => {
-    let arr = localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : [];
-    return arr;
-  };
+  const getStorage = (key) => (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : []);
 
   const setStorage = (key, value) => {
-    let data = getStorage(key);
-    data.push(value);
-    localStorage.setItem(key, JSON.stringify(data));
+    const dataContacts = getStorage(key);
+    dataContacts.push(value);
+    localStorage.setItem(key, JSON.stringify(dataContacts));
   };
 
-  const removeStorage = (phone) => {
-    localStorage.removeItem(phone);
+  const removeStorage = (phone, title) => {
+    const dataContacts = getStorage(title);
+    localStorage.removeItem(title);
+    dataContacts.splice(dataContacts.findIndex(item => item.phone === phone), 1);
+    dataContacts.map(item => setStorage(title, item));
   };
-  console.log(localStorage);
-  getStorage('Роман')
-  console.log("getStorage('Роман'): ", getStorage('Роман'));
 
-  const data = getStorage('Роман');
   const renderContacts = (elem, data) => {
     elem.textContent = '';
-    const allRow = data.map(createRow);
+    const allRow = data.map(item => createRow(item));
     elem.append(...allRow);
-
     return allRow;
   };
 
@@ -318,13 +313,12 @@ const data = [
         closeModal();
       }
     });
-
     return {
       closeModal,
     };
   };
 
-  const deleteControl = (btnDel, list) => {
+  const deleteControl = (btnDel, list, title) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
         del.classList.toggle('is-visible');
@@ -335,11 +329,9 @@ const data = [
       const target = e.target;
       if (target.closest('.del-icon')) {
         const tr = target.closest('.contact');
-        console.log('tr: ', tr);
         const phone = tr.querySelector('.phone').textContent;
-        console.log(phone);
         tr.remove();
-        //localStorage.clear();
+        removeStorage(phone, title);
       }
     });
   };
@@ -350,13 +342,13 @@ const data = [
     counter.reset = () => count = 0;
     return counter;
   };
-
+/*
   const clickName = getCounter();
   const clickSurName = getCounter();
   const clickPhone = getCounter();
 
-
-  const sortControl = (listTitle, list, logo, logoAlt, allContact) => {
+ 
+  const sortControl = (listTitle, list, logo, logoAlt, allContact, data) => {
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
 
@@ -367,8 +359,8 @@ const data = [
       if (target.closest('th') && !target.closest('.th-edit')) {
         console.log('click');
         let click = null;
-
-        switch (target.dataset.sort) {
+        let sort = target.dataset.sort;
+        switch (sort) {
           case 'name':
             click = clickName();
             clickSurName.reset();
@@ -403,29 +395,28 @@ const data = [
         renderContacts(list, data);
         logo.textContent = logoAlt.textContent;
         hoverRow(allContact, logo);
+        //localStorage.setItem('sort', sort);
       }
     });
   };
+  */
+
   const addContactPage = (contact, list) => {
     list.append(createRow(contact));
   };
 
-  const formControl = (form, list, closeModal) => {
+  const formControl = (form, title, list, closeModal) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
-
       const newContact = Object.fromEntries(formData);
-      console.log('newContact: ', newContact);
-      setStorage('Роман', newContact);
+
+      setStorage(title, newContact);
       addContactPage(newContact, list);
       form.reset();
       closeModal();
     });
   };
-
-
-  
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
@@ -441,16 +432,17 @@ const data = [
     } = renderPhoneBook(app, title);
 
     // Функционал
+    const data = getStorage(title);
+    //const logoAlt = cloneObj(logo);
 
-    const logoAlt = cloneObj(logo);
     renderContacts(list, data);
     const {closeModal} = modalControl(btnAdd, formOverlay);
-    const allContact = document.getElementsByClassName('contact');
-    hoverRow(allContact, logo);
+    //const allContact = document.getElementsByClassName('contact');
+    //hoverRow(allContact, logo);
 
-    deleteControl(btnDel, list);
-    sortControl(listTitle, list, logo, logoAlt, allContact);
-    formControl(form, list, closeModal);
+    deleteControl(btnDel, list, title);
+    // sortControl(listTitle, list, logo, logoAlt, allContact, data);
+    formControl(form, title, list, closeModal);
   };
 
 
