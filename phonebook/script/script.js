@@ -229,7 +229,7 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.classList.add('phone');
     phoneLink.href = `tel:${phone}`;
-    phoneLink.textContent = `+${phone}`;
+    phoneLink.textContent = `${phone}`;
     tr.phoneLink = phoneLink;
 
     tdPhone.append(phoneLink);
@@ -256,6 +256,26 @@ const data = [
   const getStorage = (key) => (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : []);
 
   const setStorage = (key, value) => {
+    console.log('set');
+    return localStorage.setItem(key, JSON.stringify(value));
+  };
+
+  const addContactData = (key, value) => {
+    const dataContacts = getStorage(key);
+    dataContacts.push(value);
+    setStorage(key, dataContacts);
+    console.log('add');
+  };
+
+  const removeStorage = (phone, title) => {
+    const dataContacts = getStorage(title);
+    const newDataContacts = dataContacts.filter(item => item.phone !== phone);
+    setStorage(title, newDataContacts);
+  };
+  /*
+  const getStorage = (key) => (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : []);
+
+  const setStorage = (key, value) => {
     const dataContacts = getStorage(key);
     dataContacts.push(value);
     localStorage.setItem(key, JSON.stringify(dataContacts));
@@ -267,7 +287,7 @@ const data = [
     dataContacts.splice(dataContacts.findIndex(item => item.phone === phone), 1);
     dataContacts.map(item => setStorage(title, item));
   };
-
+*/
   const renderContacts = (elem, data) => {
     elem.textContent = '';
     const allRow = data.map(item => createRow(item));
@@ -296,12 +316,16 @@ const data = [
     return newObj;
   };
 
+  const addClassElem = (elem, selectorClass) => elem.classList.add(selectorClass);
+
+  const removeClassElem = (selectorClass, removeClass) => {
+    document.querySelectorAll(selectorClass).forEach(elem => elem?.classList.remove(removeClass));
+  };
+
   const modalControl = (btnAdd, formOverlay) => {
     const openModal = () => {
-      formOverlay.classList.add('is-visible');
-      document.querySelectorAll('.delete').forEach(del => {
-        del.classList.remove('is-visible');
-      });
+      addClassElem(formOverlay, 'is-visible');
+      removeClassElem('.delete', 'is-visible');
     };
 
     const closeModal = () => {
@@ -320,6 +344,7 @@ const data = [
       closeModal,
     };
   };
+
 
   // как можно оптимизировать данную функцию???
   const deleteControl = (btnDel, list, title, logo, logoAlt) => {
@@ -340,11 +365,9 @@ const data = [
       if (!document.querySelector('.contact')) {
         logo.textContent = logoAlt.textContent;
         localStorage.removeItem('sort');
-        document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
-        document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
-        document.querySelectorAll('.delete').forEach(del => {
-          del.classList.remove('is-visible');
-        });
+        removeClassElem('.up', 'up');
+        removeClassElem('.down', 'down');
+        removeClassElem('.delete', 'is-visible');
       }
     });
   };
@@ -387,31 +410,27 @@ const data = [
       }
     }
 
-    document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
-    document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
-
-    const dataLs = getStorage(title);
+    removeClassElem('.up', 'up');
+    removeClassElem('.down', 'down');
+    const data = getStorage(title);
 
     if (click % 2 === 0) {
-      dataLs.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
+      data.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
       document.querySelector(`.${sort}`)?.classList.add('up');
       localStorage.setItem('click', 0);
     } else {
-      dataLs.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
+      data.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
       document.querySelector(`.${sort}`)?.classList.add('down');
       localStorage.setItem('click', 1);
     }
     singleTriggerCondition();
-    return dataLs;
+    return data;
   };
 
   const sortControl = (listTitle, list, logo, logoAlt, allContact, title) => {
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
-
-      document.querySelectorAll('.delete').forEach(del => {
-        del?.classList.remove('is-visible');
-      });
+      removeClassElem('.delete', 'is-visible');
 
       if (target.closest('th') && !target.closest('.th-edit')) {
         const sortKey = target.dataset.sort;
@@ -433,7 +452,7 @@ const data = [
       const formData = new FormData(e.target);
       const newContact = Object.fromEntries(formData);
 
-      setStorage(title, newContact);
+      addContactData(title, newContact);
       addContactPage(newContact, list);
       form.reset();
       closeModal();
@@ -475,5 +494,3 @@ const data = [
 
   window.phoneBookInit = init;
 }
-
-
