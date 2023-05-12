@@ -318,14 +318,27 @@ const data = [
 
   const addClassElem = (elem, selectorClass) => elem.classList.add(selectorClass);
 
-  const removeClassElem = (selectorClass, removeClass) => {
-    document.querySelectorAll(selectorClass).forEach(elem => elem?.classList.remove(removeClass));
+  const changeClassElem = (elemClass, selectorClass, method) => {
+    const elems = document.querySelectorAll(elemClass);
+    switch (method) {
+      case 'add':
+        elems.forEach(elem => elem?.classList.add(selectorClass));
+        break;
+      case 'remove':
+        elems.forEach(elem => elem?.classList.remove(selectorClass));
+        break;
+      case 'toggle':
+        elems.forEach(elem => elem?.classList.toggle(selectorClass));
+        break;
+      default:
+        console.log('Что-то пошло не так');
+    }
   };
 
   const modalControl = (btnAdd, formOverlay) => {
     const openModal = () => {
       addClassElem(formOverlay, 'is-visible');
-      removeClassElem('.delete', 'is-visible');
+      changeClassElem('.delete', 'is-visible', 'remove');
     };
 
     const closeModal = () => {
@@ -349,9 +362,7 @@ const data = [
   // как можно оптимизировать данную функцию???
   const deleteControl = (btnDel, list, title, logo, logoAlt) => {
     btnDel.addEventListener('click', () => {
-      document.querySelectorAll('.delete').forEach(del => {
-        del.classList.toggle('is-visible');
-      });
+      changeClassElem('.delete', 'is-visible', 'toggle');
     });
 
     list.addEventListener('click', (e) => {
@@ -365,9 +376,9 @@ const data = [
       if (!document.querySelector('.contact')) {
         logo.textContent = logoAlt.textContent;
         localStorage.removeItem('sort');
-        removeClassElem('.up', 'up');
-        removeClassElem('.down', 'down');
-        removeClassElem('.delete', 'is-visible');
+        changeClassElem('.up', 'up', 'remove');
+        changeClassElem('.down', 'down', 'remove');
+        changeClassElem('.delete', 'is-visible', 'remove');
       }
     });
   };
@@ -410,17 +421,19 @@ const data = [
       }
     }
 
-    removeClassElem('.up', 'up');
-    removeClassElem('.down', 'down');
+    changeClassElem('.up', 'up', 'remove');
+    changeClassElem('.down', 'down', 'remove');
     const data = getStorage(title);
 
     if (click % 2 === 0) {
       data.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
-      document.querySelector(`.${sort}`)?.classList.add('up');
+      changeClassElem(`.${sort}`, 'up', 'add');
+      //document.querySelector(`.${sort}`)?.classList.add('up');
       localStorage.setItem('click', 0);
     } else {
       data.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
-      document.querySelector(`.${sort}`)?.classList.add('down');
+      changeClassElem(`.${sort}`, 'down', 'add');
+      //document.querySelector(`.${sort}`)?.classList.add('down');
       localStorage.setItem('click', 1);
     }
     singleTriggerCondition();
@@ -430,7 +443,7 @@ const data = [
   const sortControl = (listTitle, list, logo, logoAlt, allContact, title) => {
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
-      removeClassElem('.delete', 'is-visible');
+      changeClassElem('.delete', 'is-visible', 'remove');
 
       if (target.closest('th') && !target.closest('.th-edit')) {
         const sortKey = target.dataset.sort;
