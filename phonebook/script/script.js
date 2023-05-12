@@ -346,26 +346,33 @@ const data = [
   const clickName = getCounter();
   const clickSurName = getCounter();
   const clickPhone = getCounter();
+  // 
+  const singleTriggerCondition = getCounter();
 
-  const sortirovka = (sort, title) => {
+  const sortData = (sort, title) => {
     let click = null;
-    console.log('sort', sort);
-    switch (sort) {
-      case 'name':
-        click = clickName();
-        clickSurName.reset();
-        clickPhone.reset();
-        break;
-      case 'surname':
-        click = clickSurName();
-        clickName.reset();
-        clickPhone.reset();
-        break;
-      case 'phone':
-        click = clickPhone();
-        clickName.reset();
-        clickSurName.reset();
-        break;
+
+    if ((+localStorage.getItem('click') === 1) && !singleTriggerCondition()) {
+      click = +localStorage.getItem('click');
+      console.log('сработал');
+    } else {
+      switch (sort) {
+        case 'name':
+          click = clickName();
+          clickSurName.reset();
+          clickPhone.reset();
+          break;
+        case 'surname':
+          click = clickSurName();
+          clickName.reset();
+          clickPhone.reset();
+          break;
+        case 'phone':
+          click = clickPhone();
+          clickName.reset();
+          clickSurName.reset();
+          break;
+      }
     }
 
     document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
@@ -377,12 +384,13 @@ const data = [
     if (click % 2 === 0) {
       dataLs.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
       document.querySelector(`.${sort}`)?.classList.add('up');
+      localStorage.setItem('click', 0);
     } else {
       dataLs.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
       document.querySelector(`.${sort}`)?.classList.add('down');
+      localStorage.setItem('click', 1);
     }
-    console.log(dataLs);
-    localStorage.setItem('click', click);
+    singleTriggerCondition();
     return dataLs;
   };
 
@@ -395,16 +403,14 @@ const data = [
       });
 
       if (target.closest('th') && !target.closest('.th-edit')) {
-        let sortKey = target.dataset.sort;
-
-        renderContacts(list, sortirovka(sortKey, title));
-        //logo.textContent = logoAlt.textContent;
-        //hoverRow(allContact, logo);
+        const sortKey = target.dataset.sort;
+        renderContacts(list, sortData(sortKey, title));
+        // logo.textContent = logoAlt.textContent;
+        // hoverRow(allContact, logo);
         localStorage.setItem('sort', sortKey);
       }
     });
   };
-
 
   const addContactPage = (contact, list) => {
     list.append(createRow(contact));
@@ -437,28 +443,24 @@ const data = [
     } = renderPhoneBook(app, title);
 
     // Функционал
-    let data = getStorage(title);
-    console.log('data: ', data);
+    const data = getStorage(title);
     const logoAlt = cloneObj(logo);
-    console.log(localStorage.getItem('sort'));
-    
+
     if (localStorage.getItem('sort')) {
       console.log('sort');
-      renderContacts(list, sortirovka(localStorage.getItem('sort'), title));
+      renderContacts(list, sortData(localStorage.getItem('sort'), title));
     } else {
       renderContacts(list, data);
     }
-    
-    
+
     const {closeModal} = modalControl(btnAdd, formOverlay);
     const allContact = document.getElementsByClassName('contact');
-    //hoverRow(allContact, logo);
+    // hoverRow(allContact, logo);
 
     deleteControl(btnDel, list, title);
     sortControl(listTitle, list, logo, logoAlt, allContact, title);
     formControl(form, title, list, closeModal);
   };
-
 
   window.phoneBookInit = init;
 }
