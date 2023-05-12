@@ -321,6 +321,7 @@ const data = [
     };
   };
 
+  // как можно оптимизировать данную функцию???
   const deleteControl = (btnDel, list, title, logo, logoAlt) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
@@ -341,6 +342,9 @@ const data = [
         localStorage.removeItem('sort');
         document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
         document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
+        document.querySelectorAll('.delete').forEach(del => {
+          del.classList.remove('is-visible');
+        });
       }
     });
   };
