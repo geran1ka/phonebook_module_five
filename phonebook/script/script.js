@@ -229,7 +229,7 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.classList.add('phone');
     phoneLink.href = `tel:${phone}`;
-    phoneLink.textContent = phone;
+    phoneLink.textContent = `+${phone}`;
     tr.phoneLink = phoneLink;
 
     tdPhone.append(phoneLink);
@@ -299,6 +299,9 @@ const data = [
   const modalControl = (btnAdd, formOverlay) => {
     const openModal = () => {
       formOverlay.classList.add('is-visible');
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.remove('is-visible');
+      });
     };
 
     const closeModal = () => {
@@ -318,7 +321,7 @@ const data = [
     };
   };
 
-  const deleteControl = (btnDel, list, title) => {
+  const deleteControl = (btnDel, list, title, logo, logoAlt) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
         del.classList.toggle('is-visible');
@@ -333,6 +336,12 @@ const data = [
         tr.remove();
         removeStorage(phone, title);
       }
+      if (!document.querySelector('.contact')) {
+        logo.textContent = logoAlt.textContent;
+        localStorage.removeItem('sort');
+        document.querySelectorAll('.up').forEach(elem => elem.classList.remove('up'));
+        document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
+      }
     });
   };
 
@@ -346,7 +355,7 @@ const data = [
   const clickName = getCounter();
   const clickSurName = getCounter();
   const clickPhone = getCounter();
-  // 
+  // Для подтягивания из localStorage значения click при обновлении страницы
   const singleTriggerCondition = getCounter();
 
   const sortData = (sort, title) => {
@@ -354,7 +363,6 @@ const data = [
 
     if ((+localStorage.getItem('click') === 1) && !singleTriggerCondition()) {
       click = +localStorage.getItem('click');
-      console.log('сработал');
     } else {
       switch (sort) {
         case 'name':
@@ -379,7 +387,6 @@ const data = [
     document.querySelectorAll('.down').forEach(elem => elem.classList.remove('down'));
 
     const dataLs = getStorage(title);
-    console.log('dataLs: ', dataLs);
 
     if (click % 2 === 0) {
       dataLs.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
@@ -405,8 +412,8 @@ const data = [
       if (target.closest('th') && !target.closest('.th-edit')) {
         const sortKey = target.dataset.sort;
         renderContacts(list, sortData(sortKey, title));
-        // logo.textContent = logoAlt.textContent;
-        // hoverRow(allContact, logo);
+        logo.textContent = logoAlt.textContent;
+        hoverRow(allContact, logo);
         localStorage.setItem('sort', sortKey);
       }
     });
@@ -416,7 +423,7 @@ const data = [
     list.append(createRow(contact));
   };
 
-  const formControl = (form, title, list, closeModal) => {
+  const formControl = (form, title, list, closeModal, allContact, logo) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -426,6 +433,7 @@ const data = [
       addContactPage(newContact, list);
       form.reset();
       closeModal();
+      hoverRow(allContact, logo);
     });
   };
 
@@ -447,7 +455,6 @@ const data = [
     const logoAlt = cloneObj(logo);
 
     if (localStorage.getItem('sort')) {
-      console.log('sort');
       renderContacts(list, sortData(localStorage.getItem('sort'), title));
     } else {
       renderContacts(list, data);
@@ -455,11 +462,11 @@ const data = [
 
     const {closeModal} = modalControl(btnAdd, formOverlay);
     const allContact = document.getElementsByClassName('contact');
-    // hoverRow(allContact, logo);
+    hoverRow(allContact, logo);
 
-    deleteControl(btnDel, list, title);
+    deleteControl(btnDel, list, title, logo, logoAlt);
     sortControl(listTitle, list, logo, logoAlt, allContact, title);
-    formControl(form, title, list, closeModal);
+    formControl(form, title, list, closeModal, allContact, logo);
   };
 
   window.phoneBookInit = init;
