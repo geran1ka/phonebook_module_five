@@ -1,5 +1,5 @@
 'use strict';
-
+/*
 {
   const getStorage = (key) => (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : []);
 
@@ -17,3 +17,4 @@
     setStorage(title, newDataContacts);
   };
 }
+*/
