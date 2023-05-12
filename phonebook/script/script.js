@@ -255,10 +255,7 @@ const data = [
 
   const getStorage = (key) => (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : []);
 
-  const setStorage = (key, value) => {
-    console.log('set');
-    return localStorage.setItem(key, JSON.stringify(value));
-  };
+  const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
   const addContactData = (key, value) => {
     const dataContacts = getStorage(key);
@@ -294,7 +291,7 @@ const data = [
     elem.append(...allRow);
     return allRow;
   };
-
+  /*
   const hoverRow = (allRow, logo) => {
     const text = logo.textContent;
     for (const contact of allRow) {
@@ -306,6 +303,7 @@ const data = [
       });
     }
   };
+  */
   // функция клонирования объекта
   const cloneObj = (obj) => {
     const newObj = {};
@@ -355,12 +353,11 @@ const data = [
     });
     return {
       closeModal,
+      openModal,
     };
   };
 
-
-  // как можно оптимизировать данную функцию???
-  const deleteControl = (btnDel, list, title, logo, logoAlt) => {
+  const deleteControl = (btnDel, list, title, logoTitleReset) => {
     btnDel.addEventListener('click', () => {
       changeClassElem('.delete', 'is-visible', 'toggle');
     });
@@ -374,7 +371,7 @@ const data = [
         removeStorage(phone, title);
       }
       if (!document.querySelector('.contact')) {
-        logo.textContent = logoAlt.textContent;
+        logoTitleReset();
         localStorage.removeItem('sort');
         changeClassElem('.up', 'up', 'remove');
         changeClassElem('.down', 'down', 'remove');
@@ -423,24 +420,23 @@ const data = [
 
     changeClassElem('.up', 'up', 'remove');
     changeClassElem('.down', 'down', 'remove');
+
     const data = getStorage(title);
 
     if (click % 2 === 0) {
       data.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
       changeClassElem(`.${sort}`, 'up', 'add');
-      //document.querySelector(`.${sort}`)?.classList.add('up');
       localStorage.setItem('click', 0);
     } else {
       data.sort((a, b) => (a[sort] > b[sort] ? -1 : 1));
       changeClassElem(`.${sort}`, 'down', 'add');
-      //document.querySelector(`.${sort}`)?.classList.add('down');
       localStorage.setItem('click', 1);
     }
     singleTriggerCondition();
     return data;
   };
 
-  const sortControl = (listTitle, list, logo, logoAlt, allContact, title) => {
+  const sortControl = (listTitle, list, title, hoverRow, logoTitleReset) => {
     listTitle.addEventListener('click', (e) => {
       const target = e.target;
       changeClassElem('.delete', 'is-visible', 'remove');
@@ -448,8 +444,8 @@ const data = [
       if (target.closest('th') && !target.closest('.th-edit')) {
         const sortKey = target.dataset.sort;
         renderContacts(list, sortData(sortKey, title));
-        logo.textContent = logoAlt.textContent;
-        hoverRow(allContact, logo);
+        logoTitleReset();
+        hoverRow();
         localStorage.setItem('sort', sortKey);
       }
     });
@@ -459,7 +455,7 @@ const data = [
     list.append(createRow(contact));
   };
 
-  const formControl = (form, title, list, closeModal, allContact, logo) => {
+  const formControl = (form, title, list, closeModal, hoverRow) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -469,7 +465,26 @@ const data = [
       addContactPage(newContact, list);
       form.reset();
       closeModal();
-      hoverRow(allContact, logo);
+      hoverRow();
+    });
+  };
+
+  const edit = (list, openModal, title, form, logoTitleReset) => {
+    list.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.button-table')) {
+        openModal();
+        const tr = target.closest('.contact');
+        const phone = tr.querySelector('.phone').textContent;
+        const data = getStorage(title);
+        const editContact = data.find(item => item.phone === phone);
+        form.name.value = editContact.name;
+        form.surname.value = editContact.surname;
+        form.phone.value = editContact.phone;
+        removeStorage(phone, title);
+        tr.remove();
+        logoTitleReset();
+      }
     });
   };
 
@@ -489,20 +504,30 @@ const data = [
     // Функционал
     const data = getStorage(title);
     const logoAlt = cloneObj(logo);
-
+    const logoTitleReset = () => logo.textContent = logoAlt.textContent;
     if (localStorage.getItem('sort')) {
       renderContacts(list, sortData(localStorage.getItem('sort'), title));
     } else {
       renderContacts(list, data);
     }
-
-    const {closeModal} = modalControl(btnAdd, formOverlay);
+    const {closeModal, openModal} = modalControl(btnAdd, formOverlay);
     const allContact = document.getElementsByClassName('contact');
-    hoverRow(allContact, logo);
-
-    deleteControl(btnDel, list, title, logo, logoAlt);
-    sortControl(listTitle, list, logo, logoAlt, allContact, title);
-    formControl(form, title, list, closeModal, allContact, logo);
+    const hoverRow = () => {
+      const text = logo.textContent;
+      for (const contact of allContact) {
+        contact.addEventListener('mouseenter', () => {
+          logo.textContent = contact.phoneLink.textContent;
+        });
+        contact.addEventListener('mouseleave', () => {
+          logo.textContent = text;
+        });
+      }
+    };
+    hoverRow();
+    deleteControl(btnDel, list, title, logoTitleReset);
+    sortControl(listTitle, list, title, hoverRow, logoTitleReset);
+    formControl(form, title, list, closeModal, hoverRow);
+    edit(list, openModal, title, form, logoTitleReset);
   };
 
   window.phoneBookInit = init;
