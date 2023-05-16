@@ -19,4 +19,4 @@ export {
   setStorage,
   addContactData,
   removeStorage,
-}
+};
