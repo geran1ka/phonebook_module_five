@@ -5,6 +5,10 @@ import * as sort from './script/modules/sort.js';
 import {modalControl, formControl, deleteControl, edit} from './script/modules/control.js';
 import {hoverRow as hover} from './script/modules/function/hover.js';
 
+import './css/normalize.min.css';
+import './css/bootstrap.min.css';
+import './css/style.css';
+
 {
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
