@@ -15,9 +15,9 @@ module.exports = {
   },
   entry: ['@babel/polyfill', './src/index.js'],
   output: {
-    filename: '[name][contenthash].js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+    filename: '[name][contenthash].js',
     assetModuleFilename: 'assets/[hash][ext][query]',
   },
   plugins: [

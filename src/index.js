@@ -40,5 +40,5 @@ import './scss/index.scss';
     edit(list, openModal, title, form, logoTitleReset);
   };
 
-  window.phoneBookInit = init;
+  init('#app', 'Роман');
 }
