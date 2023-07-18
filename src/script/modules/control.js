@@ -1,6 +1,6 @@
-import {addClassElem, changeClassElem} from './function/changeClassElem.js';
-import {removeStorage, getStorage, addContactData} from './localStorageServis.js';
-import {addContactPage} from './createElements.js';
+import {addClassElem, changeClassElem} from './function/changeClassElem';
+import {removeStorage, getStorage, addContactData} from './localStorageServis';
+import {addContactPage} from './createElements';
 
 
 const modalControl = (btnAdd, formOverlay) => {

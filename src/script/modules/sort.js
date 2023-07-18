@@ -1,8 +1,8 @@
-import {getStorage} from './localStorageServis.js';
-import {renderContacts} from './renderElements.js';
-import {getCounter as counter} from './function/getCounter.js';
-import {addClassElem, changeClassElem} from './function/changeClassElem.js';
-import {hoverRow as hover} from './function/hover.js';
+import {getStorage} from './localStorageServis';
+import {renderContacts} from './renderElements';
+import {getCounter as counter} from './function/getCounter';
+import {addClassElem, changeClassElem} from './function/changeClassElem';
+import {hoverRow as hover} from './function/hover';
 
 const clickName = counter();
 const clickSurName = counter();
