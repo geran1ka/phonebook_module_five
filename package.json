@@ -1,0 +1,36 @@
+{
+  "name": "lesson_05_04_phonebook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "data.js",
+  "scripts": {
+    "start": "set NODE_ENV=development&&webpack serve --open",
+    "dev": "set NODE_ENV=development&&webpack",
+    "build": "set NODE_ENV=production&&webpack",
+    "clear": "rd /s /q dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geran1ka/phonebook_module_five.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geran1ka/phonebook_module_five/issues"
+  },
+  "homepage": "https://github.com/geran1ka/phonebook_module_five#readme",
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "mini-css-extract-plugin": "^2.7.6",
+    "postcss": "^8.4.26",
+    "postcss-loader": "^7.3.3",
+    "postcss-preset-env": "^9.0.0",
+    "sass": "^1.63.6",
+    "sass-loader": "^13.3.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "webpack-dev-server": "^4.15.1"
+  }
+}

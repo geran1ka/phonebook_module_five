@@ -1,9 +1,9 @@
-import {renderPhoneBook, renderContacts} from './modules/renderElements.js';
-import {getStorage} from './modules/localStorageServis.js';
-import cloneObj from './modules/function/cloneObj.js';
-import * as sort from './modules/sort.js';
-import {modalControl, formControl, deleteControl, edit} from './modules/control.js';
-import {hoverRow as hover} from './modules/function/hover.js';
+import {renderPhoneBook, renderContacts} from './script/modules/renderElements.js';
+import {getStorage} from './script/modules/localStorageServis.js';
+import cloneObj from './script/modules/function/cloneObj.js';
+import * as sort from './script/modules/sort.js';
+import {modalControl, formControl, deleteControl, edit} from './script/modules/control.js';
+import {hoverRow as hover} from './script/modules/function/hover.js';
 
 {
   const init = (selectorApp, title) => {
